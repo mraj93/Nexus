@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    { "src": "/hello", "dest": "index.js" },
+    { "src": "/mintERC721", "dest": "index.js" },
+    { "src": "/NFTDetails/:tokenId", "dest": "index.js" },
+    { "src": "/getAllnfts", "dest": "index.js" },
+    { "src": "/updateMetadata", "dest": "index.js" },
+    { "src": "/latestTokenId", "dest": "index.js" },
+    { "src": "/recentNFTs", "dest": "index.js" },
+    { "src": "/(.*)", "dest": "index.js" }
+  ]
+}
