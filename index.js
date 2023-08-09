@@ -29,16 +29,17 @@ const Contract = new web3.eth.Contract(
     ContractJSON.abi,
     ContractAddress
 );
+const app = express();
 
-index.use(cors());
-index.use(express.json());
+app.use(cors());
+app.use(express.json());
 
-index.listen(PORT, () => {
+app.listen(PORT, () => {
     console.log("Server is running")
 });
 
 //Todo get Hello World
-index.get('/hello', async (req, res) => {
+app.get('/hello', async (req, res) => {
     console.log("Hello World")
     res.status(200).json({
         "message" : "Hello"
@@ -111,10 +112,10 @@ const mintERC721 = async (req, res) => {
         }
     }
 }
-index.route('/mintERC721').post(mintERC721);
+app.route('/mintERC721').post(mintERC721);
 
 //Todo get ERC721 token details
-index.get('/NFTDetails/:tokenId', async (req, res) => {
+app.get('/NFTDetails/:tokenId', async (req, res) => {
     try {
         let owner = await Contract.methods.ownerOf(req.params.tokenId).call();
         let creator = await Contract.methods.Creator(req.params.tokenId).call();
@@ -135,7 +136,7 @@ index.get('/NFTDetails/:tokenId', async (req, res) => {
 });
 
 //Todo GetAllNFTsright-icon
-index.get('/getAllnfts', async (req, res) => {
+app.get('/getAllnfts', async (req, res) => {
     try {
         const allNFTs = await NFTSchema.find({});
         console.log(allNFTs)
@@ -149,7 +150,7 @@ index.get('/getAllnfts', async (req, res) => {
 });
 
 //Todo update metadata
-index.post('/updateMetadata', async (req, res) => {
+app.post('/updateMetadata', async (req, res) => {
     try {
         const nonce = await web3.eth.getTransactionCount(ADDRESS);
         const oldMetadata = await Contract.methods.tokenURI(req.body.tokenId).call();
@@ -186,7 +187,7 @@ index.post('/updateMetadata', async (req, res) => {
 });
 
 // Todo to get latest tokenID
-index.get('/latestTokenId', async (req, res) => {
+app.get('/latestTokenId', async (req, res) => {
     try {
         let latestTokenId = await Contract.methods.tokenID().call();
         res.status(200).json({latestTokenId: latestTokenId.toString()});
@@ -198,7 +199,7 @@ index.get('/latestTokenId', async (req, res) => {
 })
 
 // Todo get the recent NFTs
-index.get('/recentNFTs', async (req, res) => {
+app.get('/recentNFTs', async (req, res) => {
     try {
         let latestTokenId = await Contract.methods.tokenId().call();
         const recentNFTs = await NFTSchema.find({}).sort({ latestTokenId: -1 }).limit(6);
