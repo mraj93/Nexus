@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
-    "build": "babel app.js -o build.js",
+    "build": "babel app.js -o build.js && echo 'Build completed successfully.'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
