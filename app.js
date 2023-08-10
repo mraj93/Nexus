@@ -17,20 +17,18 @@ import NFTSchema from "./Schema/nft.js";
 //     }
 // });
 
-
 ConnectDB();
 
 let web3 = new Web3(process.env.API_URL);
-
-const {ADDRESS, PRIVATE_KEY, PORT} = process.env;
-const index = express();
+const {ADDRESS, PRIVATE_KEY } = process.env;
+const app = express();
 const ContractAddress = "0x2E5d994CA738ae8B83277ce361A4A68180324dD1";
 const Contract = new web3.eth.Contract(
     ContractJSON.abi,
     ContractAddress
 );
-const app = express();
 
+const PORT = process.env.PORT || 9001;
 app.use(cors());
 app.use(express.json());
 
