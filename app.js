@@ -64,6 +64,7 @@ const mintERC721 = async (req, res) => {
                 to: ContractAddress,
                 data: data,
             });
+            
             const bufferPercentage = 10;
             const bufferedGasLimit = gasLimit * BigInt(100 + bufferPercentage) / BigInt(100);
             const txn = await web3.eth.accounts.signTransaction({
