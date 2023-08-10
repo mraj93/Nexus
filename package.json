@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "node app.js",
-    "dev" : "nodemon app.js",
+    "dev": "nodemon app.js",
+    "build": "babel app.js -o build.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -21,11 +22,18 @@
   },
   "homepage": "https://github.com/mraj93/Nexus#readme",
   "dependencies": {
+    "@babel/cli": "^7.22.10",
+    "@babel/core": "^7.22.10",
+    "@babel/preset-env": "^7.22.10",
     "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
+    "module": "^1.2.5",
     "mongoose": "^6.10.1",
     "nodemon": "^3.0.1",
     "web3": "^4.0.3"
+  },
+  "devDependencies": {
+    "@babel/plugin-syntax-import-attributes": "^7.22.5"
   }
 }
