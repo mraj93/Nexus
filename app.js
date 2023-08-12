@@ -1,12 +1,8 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-
 import Web3 from "web3";
 import express, {raw} from "express";
 import cors from 'cors';
 import ContractJSON from './JSON/ERC721.sol/MultiTokenERC721.json' assert {type: "json"};
 import dotenv from "dotenv";
-
 dotenv.config();
 // import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import ConnectDB from "./connectDB.js";
@@ -25,7 +21,7 @@ ConnectDB();
 let web3 = new Web3(process.env.API_URL);
 const {ADDRESS, PRIVATE_KEY } = process.env;
 const app = express();
-const ContractAddress = "0x2E5d994CA738ae8B83277ce361A4A68180324dD1";
+const ContractAddress = process.env.CONTRACT_ADDRESS;
 const Contract = new web3.eth.Contract(
     ContractJSON.abi,
     ContractAddress
@@ -215,5 +211,4 @@ app.get('/recentNFTs', async (req, res) => {
     }
 });
 
-export default app;
-// "test": "echo \"Error: no test specified\" && exit 1",
+// export default app;
