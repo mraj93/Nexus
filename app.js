@@ -27,7 +27,7 @@ const Contract = new web3.eth.Contract(
     ContractAddress
 );
 
-const PORT = process.env.PORT || 9001;
+const PORT = process.env.PORT || 9000;
 app.use(cors());
 app.use(express.json());
 
