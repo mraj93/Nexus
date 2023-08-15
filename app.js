@@ -3,9 +3,8 @@ import express, {raw} from "express";
 import cors from 'cors';
 import ContractJSON from './JSON/ERC721.sol/MultiTokenERC721.json' assert {type: "json"};
 import dotenv from "dotenv";
-import {ethers} from "ethers";
-dotenv.config();
 
+dotenv.config();
 // import { DynamoDBClient, PutItemCommand } from '@aws-sdk/client-dynamodb';
 import ConnectDB from "./connectDB.js";
 import NFTSchema from "./Schema/nft.js";
@@ -29,7 +28,7 @@ const Contract = new web3.eth.Contract(
     ContractAddress
 );
 
-const PORT = process.env.PORT || 9090;
+const PORT = process.env.PORT || 9001;
 app.use(cors());
 app.use(express.json());
 
@@ -49,29 +48,61 @@ app.get('/hello', async (req, res) => {
 const mintERC721 = async (req, res) => {
     {
         try {
-            const data = req.body;
-
-            const priceInWei = web3.utils.toWei(data.price.toString(), 'ether'); // Convert to Wei
-            const priceInWeiString = priceInWei.toString();
-
-            console.log("price of ETH", data.price);
-
-            console.log("generateReceipt is here", data);
-            try {
+            const nonce = await web3.eth.getTransactionCount(ADDRESS);
+            const gasPrice = (await web3.eth.getGasPrice()).toString() || '2000000000000';
+            const tokenID = Number(await Contract.methods.tokenId().call());
+            console.log("tokenID", tokenID);
+            const data = Contract.methods.mint(
+                req.body.nftName,
+                req.body.price,
+                req.body.description,
+                req.body.nftURI,
+                req.body.metaDataURI,
+            ).encodeABI();
+            const gasLimit = await web3.eth.estimateGas({
+                from: ADDRESS,
+                to: ContractAddress,
+                data: data,
+            });
+            
+            const bufferPercentage = 10;
+            const bufferedGasLimit = gasLimit * BigInt(100 + bufferPercentage) / BigInt(100);
+            const txn = await web3.eth.accounts.signTransaction({
+                    from: ADDRESS,
+                    to: ContractAddress,
+                    nonce: nonce,
+                    gasPrice: gasPrice,
+                    gasLimit: bufferedGasLimit,
+                    // gasLimit: 6000000,
+                    data: Contract.methods.mint(
+                        req.body.nftName,
+                        req.body.price,
+                        req.body.description,
+                        req.body.nftURI,
+                        req.body.metaDataURI,
+                    ).encodeABI(),
+                },
+                PRIVATE_KEY
+            );
+            const generateReceipt = await web3.eth.sendSignedTransaction(txn.rawTransaction);
+            if (generateReceipt) {
+                res.status(200).json({
+                    "message": "Mint Successfully" + generateReceipt.transactionHash
+                })
+                try {
                     const savedData = await NFTSchema.create({
-                        tokenId: data.tokenID,
-                        nftName: data.nftName,
-                        price: priceInWeiString,
-                        description: data.description,
-                        nftURI: data.nftURI,
-                        metaDataURI: data.metaDataURI,
-                        generateReceipt: data.generateReceipt
+                        tokenId: tokenID,
+                        nftName: req.body.nftName,
+                        price: req.body.price,
+                        description: req.body.description,
+                        nftURI: req.body.nftURI,
+                        metaDataURI: req.body.metaDataURI,
+                        generateReceipt: generateReceipt.transactionHash,
                     })
-                    console.log("Data saved:", savedData);
-                    res.status(200).json({ message: "Data saved successfully" });
                 } catch (e) {
                     console.error("error while saving the data", e)
                 }
+            }
         } catch (e) {
             console.log(e)
             res.status(404).json({
